@@ -24,7 +24,8 @@
 - 云端端到端：真实安装引导绑定、视频实际解码、停止观看仍云录像、MP4 生成、喊话确认、Electron 重启后使用原 DPAPI 凭据、网站撤销后旧设备断开。
 - `npx electron-builder --win nsis --x64`：用户级 NSIS 构建成功；`XY_DESKTOP_EXE` 指向 `release/win-unpacked/小影子教室助手.exe` 后复测云端完整流程 1/1 通过，20.5 秒。
 - `npm run dev:cloud` 对应启动脚本烟雾检查：浏览器和采集窗口打开、合成设备模式就绪、输入 q 正常退出，退出码 0。
-- `docker compose -f deploy/compose.yaml --env-file deploy/.env.example config --quiet`：通过。Docker daemon 未运行，本机尚未执行容器构建/运行与 Caddy 校验；已增加 Linux CI 执行这些检查。
+- `docker compose -f deploy/compose.yaml --env-file deploy/.env.example config --quiet`：本机通过。本机 Docker daemon 未运行，容器构建/运行及 Caddy 校验由 GitHub Linux CI 执行并通过。
+- GitHub [Delivery checks #41578884668](https://github.com/littseadol/xiaoyingzi-xunke-project/actions/runs/41578884668)：Windows 与 Linux 全部成功，验证源码提交 `4cc34d287d47e5a3e03327b5a948cf7aa3944f90`。Windows 23 项逻辑/集成检查及 3 项媒体端到端通过（51.9 秒）；Linux 镜像构建、HTTP 健康探测与 Caddy `Valid configuration` 通过。未验证公网 DNS/证书签发/TURN 中继。
 - 全部媒体证据为合成设备；未读取物理摄像头、未安装系统证书或配置防火墙。
 
 ## 0.2 交付产物
@@ -34,9 +35,9 @@
 - `release/win-unpacked/`：同版展开应用，已验证打包资源的绑定与媒体链路；不等同于完整安装/覆盖升级验收。
 - 本机调试入口 `npm run dev:cloud`，界面截图在 `test-results/cloud-live.png` 与 `test-results/cloud-collector.png`；截图、密码、录像和证书均不提交 Git。
 - GitHub 上传仅包含源码、锁文件、文档和 CI。当前网络 github.com HTTPS 直连超时，api.github.com 可达，使用现有 Git 凭据经 GitHub Git Data API 提交同一 Git 对象并核对摘要；不复制/打印凭据，不覆盖远程历史。
-- GitHub 已上传 61 个源码/配置/文档文件，远程 `main` 与本机提交一致；Windows / Linux CI 已触发，最终结果以仓库 Actions 为准。
+- GitHub 已上传 61 个源码/配置/文档文件，远程 `main` 与本机提交一致；Windows / Linux CI 已通过，随后仅补充本文件交付证据。
 - 反向代理测试发现 Node 22 fetch 不保留自定义 Host；已使用原生 HTTP request 验证接口，并将 Compose 健康检查改为同一传输方式，避免健康探测被域名限制拒绝。
-- 首次远程 CI 暴露 Windows checkout 自动 CRLF 导致格式检查失败，以及容器未就绪时端口重置没有重试。已固定仓库 LF 换行并扩展启动探测重试，继续以远程结果确认。
+- 首次远程 CI 暴露 Windows checkout 自动 CRLF 导致格式检查失败，以及容器未就绪时端口重置没有重试。已固定仓库 LF 换行并扩展启动探测重试，修复后远程复测全部通过。
 
 ## 0.2 待完成的真实环境验收
 
