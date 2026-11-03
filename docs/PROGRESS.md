@@ -36,6 +36,7 @@
 - GitHub 上传仅包含源码、锁文件、文档和 CI。当前网络 github.com HTTPS 直连超时，api.github.com 可达，使用现有 Git 凭据经 GitHub Git Data API 提交同一 Git 对象并核对摘要；不复制/打印凭据，不覆盖远程历史。
 - GitHub 已上传 61 个源码/配置/文档文件，远程 `main` 与本机提交一致；Windows / Linux CI 已触发，最终结果以仓库 Actions 为准。
 - 反向代理测试发现 Node 22 fetch 不保留自定义 Host；已使用原生 HTTP request 验证接口，并将 Compose 健康检查改为同一传输方式，避免健康探测被域名限制拒绝。
+- 首次远程 CI 暴露 Windows checkout 自动 CRLF 导致格式检查失败，以及容器未就绪时端口重置没有重试。已固定仓库 LF 换行并扩展启动探测重试，继续以远程结果确认。
 
 ## 0.2 待完成的真实环境验收
 
