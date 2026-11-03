@@ -17,7 +17,7 @@ services:
           CMD,
           node,
           -e,
-          'fetch("http://127.0.0.1:8080/api/health",{headers:{host:process.env.XY_PUBLIC_ORIGIN.slice(8)}}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))',
+          'require("node:http").get({hostname:"127.0.0.1",port:8080,path:"/api/health",headers:{host:new URL(process.env.XY_PUBLIC_ORIGIN).host}},response=>{response.resume();process.exit(response.statusCode===200?0:1)}).on("error",()=>process.exit(1))',
         ]
       interval: 30s
       timeout: 5s

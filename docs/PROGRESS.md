@@ -34,6 +34,8 @@
 - `release/win-unpacked/`：同版展开应用，已验证打包资源的绑定与媒体链路；不等同于完整安装/覆盖升级验收。
 - 本机调试入口 `npm run dev:cloud`，界面截图在 `test-results/cloud-live.png` 与 `test-results/cloud-collector.png`；截图、密码、录像和证书均不提交 Git。
 - GitHub 上传仅包含源码、锁文件、文档和 CI。当前网络 github.com HTTPS 直连超时，api.github.com 可达，使用现有 Git 凭据经 GitHub Git Data API 提交同一 Git 对象并核对摘要；不复制/打印凭据，不覆盖远程历史。
+- GitHub 已上传 61 个源码/配置/文档文件，远程 `main` 与本机提交一致；Windows / Linux CI 已触发，最终结果以仓库 Actions 为准。
+- 反向代理测试发现 Node 22 fetch 不保留自定义 Host；已使用原生 HTTP request 验证接口，并将 Compose 健康检查改为同一传输方式，避免健康探测被域名限制拒绝。
 
 ## 0.2 待完成的真实环境验收
 
