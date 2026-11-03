@@ -11,6 +11,7 @@ import type {
 import { api, formatBytes, formatTime, socketAddress } from './api';
 import { BoardController } from './board';
 import { UserGuide } from './guide';
+import { InstallerDownload } from './installer-download';
 import './styles.css';
 
 type IconName =
@@ -1355,9 +1356,7 @@ function DevicePairing() {
           : '第一次使用：在白板下载并安装采集端，再输入下方绑定码。'}
       </p>
       {installer ? (
-        <a className="secondary wide" href="/downloads/collector">
-          下载 Windows 采集端
-        </a>
+        <InstallerDownload className="secondary wide">下载 Windows 采集端</InstallerDownload>
       ) : (
         <p className="fine">采集端安装包尚未发布，请联系维护者提供。</p>
       )}

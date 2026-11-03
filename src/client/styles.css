@@ -410,6 +410,30 @@ small {
 .wide {
   width: 100%;
 }
+.installer-download {
+  min-width: 0;
+}
+.installer-download .download-help {
+  margin: 10px 0 0;
+  color: #7a8da8;
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.download-help strong {
+  display: block;
+  color: #5178b6;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.download-help kbd {
+  border: 1px solid #dce4ef;
+  border-radius: 4px;
+  background: #f5f8fc;
+  padding: 1px 4px;
+  font: inherit;
+  white-space: nowrap;
+}
 .video-toolbar {
   height: 61px;
   display: flex;

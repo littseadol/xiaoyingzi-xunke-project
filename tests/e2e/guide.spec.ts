@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { createServer } from 'node:net';
 import { startServer } from '../../src/server/app.js';
 
@@ -30,6 +30,16 @@ test('使用说明图文、安装包、页面跳转及窗口/手机适配', asyn
   });
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: null });
   const page = await context.newPage();
+  const { attachDevelopmentDownloads } = await import(
+    new URL('../../scripts/dev-downloads.mjs', import.meta.url).href
+  );
+  const savedDownloads: string[] = [];
+  const downloadErrors: Error[] = [];
+  attachDevelopmentDownloads(page, {
+    directory: join(directory, 'user-downloads'),
+    onSaved: (filename: string) => savedDownloads.push(filename),
+    onError: (error: Error) => downloadErrors.push(error),
+  });
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   try {
@@ -96,6 +106,17 @@ test('使用说明图文、安装包、页面跳转及窗口/手机适配', asyn
     const downloaded = page.waitForEvent('download');
     await page.getByRole('link', { name: '下载白板小助手', exact: true }).click();
     expect((await downloaded).suggestedFilename()).toBe('XiaoYingZi-Setup.exe');
+    await expect(page.getByRole('status').filter({ hasText: '已请求下载' })).toBeVisible();
+    await expect.poll(() => savedDownloads.length).toBe(1);
+    expect(basename(savedDownloads[0])).toBe('XiaoYingZi-Setup.exe');
+    expect(await readFile(savedDownloads[0], 'utf8')).toBe(
+      'synthetic download fixture; never execute',
+    );
+    await writeFile(savedDownloads[0], 'keep the existing file');
+    await page.getByRole('link', { name: '下载白板小助手', exact: true }).click();
+    await expect.poll(() => savedDownloads.length).toBe(2);
+    expect(basename(savedDownloads[1])).toBe('XiaoYingZi-Setup (1).exe');
+    expect(await readFile(savedDownloads[0], 'utf8')).toBe('keep the existing file');
     await page.getByRole('button', { name: '去录制与设置，生成绑定码', exact: true }).click();
     await expect(page.getByRole('heading', { name: '录制与设置', exact: true })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: '启用定时录像' })).not.toBeChecked();
@@ -113,6 +134,11 @@ test('使用说明图文、安装包、页面跳转及窗口/手机适配', asyn
     await page.getByRole('button', { name: '使用说明', exact: true }).click();
     await expect(page.getByText('安装包还没放到网站上。', { exact: false })).toBeVisible();
     await expect(page.getByRole('link', { name: '下载白板小助手', exact: true })).toHaveCount(0);
+    await context.close();
+    expect(await readFile(savedDownloads[1], 'utf8')).toBe(
+      'synthetic download fixture; never execute',
+    );
+    expect(downloadErrors).toEqual([]);
     expect(errors).toEqual([]);
   } finally {
     await context.close();

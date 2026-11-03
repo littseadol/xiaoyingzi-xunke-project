@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './api';
 import './guide.css';
+import { InstallerDownload } from './installer-download';
 
 type GuidePage = 'live' | 'recordings' | 'settings';
 type IllustrationKind = 'install' | 'connect' | 'watch' | 'record' | 'playback' | 'talk';
@@ -243,16 +244,18 @@ export function UserGuide({
             <ol>
               <li>在教室白板上打开这个网站，用访问密码登录。</li>
               <li>
-                点下方“下载白板小助手”。下载完找到 <strong>XiaoYingZi-Setup.exe</strong>，双击它。
+                点下方“下载白板小助手”。在浏览器右上角的下载列表找到{' '}
+                <strong>XiaoYingZi-Setup.exe</strong>，等下载完成，再双击打开。找不到时，电脑按 Ctrl
+                + J 查看下载列表。
               </li>
               <li>按安装窗口提示完成安装。如果询问安装范围，选择“仅为我安装”或“当前用户”。</li>
               <li>安装后打开“小影子教室采集端”，会看到“连接一次，以后自动运行”。</li>
             </ol>
             {download === 'ready' ? (
-              <a className="primary guide-download" href="/downloads/collector">
+              <InstallerDownload className="primary guide-download">
                 <GuideSymbol name="download" />
                 下载白板小助手
-              </a>
+              </InstallerDownload>
             ) : (
               <div className="guide-download-state" role="status">
                 {download === 'loading'

@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { chromium, _electron as electron } from '@playwright/test';
 import { startServer } from '../dist-server/server/app.js';
+import { attachDevelopmentDownloads } from './dev-downloads.mjs';
 
 const directory = resolve('data/cloud-dev');
 const port = Number(process.env.XY_PORT ?? 8443);
@@ -57,6 +58,7 @@ try {
   });
   const context = await browser.newContext({ viewport: null });
   const page = await context.newPage();
+  attachDevelopmentDownloads(page);
   await page.goto(origin);
   desktop = await electron.launch({
     args: ['.', ...mediaArgs, certificateArg],
