@@ -51,10 +51,11 @@ try {
     args: [
       ...mediaArgs,
       certificateArg,
+      '--start-maximized',
       '--enable-features=RunVideoCaptureServiceInBrowserProcess',
     ],
   });
-  const context = await browser.newContext();
+  const context = await browser.newContext({ viewport: null });
   const page = await context.newPage();
   await page.goto(origin);
   desktop = await electron.launch({

@@ -11,6 +11,7 @@
 - `docs/DEPLOYMENT.md`：0.1 局域网版历史部署参考。
 - `docs/CLOUD.md`：当前云端部署、域名、TURN、安装绑定、更新与回滚。
 - `docs/TESTING.md`：自动检查、合成设备测试与鸿合真机验收。
+- `docs/USER_GUIDE.md`：教师图文使用说明入口、内容与维护约定。
 - `docs/DECISIONS.md`：架构决策记录。
 - `docs/THIRD_PARTY.md`：第三方组件、FFmpeg 版本、许可证与源码入口。
 

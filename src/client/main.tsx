@@ -10,6 +10,7 @@ import type {
 } from '../shared/types';
 import { api, formatBytes, formatTime, socketAddress } from './api';
 import { BoardController } from './board';
+import { UserGuide } from './guide';
 import './styles.css';
 
 type IconName =
@@ -27,7 +28,8 @@ type IconName =
   | 'logout'
   | 'expand'
   | 'check'
-  | 'trash';
+  | 'trash'
+  | 'book';
 const CloudContext = createContext(false);
 function useCloud() {
   return useContext(CloudContext);
@@ -35,6 +37,12 @@ function useCloud() {
 
 function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, React.ReactNode> = {
+    book: (
+      <>
+        <path d="M12 5C8 2 4 3 2 4v15c3-1 6-1 10 1 4-2 7-2 10-1V4c-2-1-6-2-10 1Zm0 0v15" />
+        <path d="M5 8h3M5 12h3m8-4h3m-3 4h3" />
+      </>
+    ),
     camera: (
       <>
         <rect x="3" y="6" width="13" height="12" rx="3" />
@@ -235,7 +243,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
 
 function Dashboard({ onLogout }: { onLogout: () => void }) {
   const cloud = useCloud();
-  const [tab, setTab] = useState<'live' | 'recordings' | 'settings'>('live');
+  const [tab, setTab] = useState<'live' | 'recordings' | 'settings' | 'guide'>('live');
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState('');
   const [socketReady, setSocketReady] = useState(false);
@@ -253,6 +261,10 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   const signalQueue = useRef(Promise.resolve());
   const previewTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewGeneration = useRef(0);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [tab]);
 
   const stopLive = useCallback(() => {
     previewGeneration.current++;
@@ -464,11 +476,14 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
               { key: 'live', icon: 'camera', name: '实时教室' },
               { key: 'recordings', icon: 'video', name: '录像回放' },
               { key: 'settings', icon: 'settings', name: '录制与设置' },
+              { key: 'guide', icon: 'book', name: '使用说明' },
             ] as const
           ).map((item) => (
             <button
               key={item.key}
               className={tab === item.key ? 'nav-item active' : 'nav-item'}
+              aria-label={item.name}
+              aria-current={tab === item.key ? 'page' : undefined}
               onClick={() => setTab(item.key)}
             >
               <Icon name={item.icon} />
@@ -514,14 +529,22 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             <div>
               <span className="eyebrow">CLASSROOM COMPANION</span>
               <h1>
-                {tab === 'live' ? '实时教室' : tab === 'recordings' ? '录像回放' : '录制与设置'}
+                {tab === 'live'
+                  ? '实时教室'
+                  : tab === 'recordings'
+                    ? '录像回放'
+                    : tab === 'guide'
+                      ? '使用说明'
+                      : '录制与设置'}
               </h1>
               <p>
                 {tab === 'live'
                   ? '看一眼教室，把更多时间留给教学。'
                   : tab === 'recordings'
                     ? '按时间查找，回看教室里的每一段记录。'
-                    : '按你的课表安排录像，其余交给小影子。'}
+                    : tab === 'guide'
+                      ? '从第一次安装，到每天使用，一步一步带你来。'
+                      : '按你的课表安排录像，其余交给小影子。'}
               </p>
             </div>
             <span className="date-label">
@@ -701,6 +724,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             </>
           ) : tab === 'recordings' ? (
             <RecordingsView />
+          ) : tab === 'guide' ? (
+            <UserGuide cloud={cloud} onNavigate={setTab} />
           ) : (
             <SettingsView
               settings={overview.settings}
@@ -775,7 +800,7 @@ function ShoutButton({ disabled, shout }: { disabled: boolean; shout: Overview['
     if (disabled || busy || pending || current.current) return;
     setError('');
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-      setError('请先信任白板证书，并通过 HTTPS 地址访问，才能使用手机麦克风。');
+      setError('请通过帮你设置的人提供的完整网站地址打开，再使用麦克风。');
       return;
     }
     if (typeof MediaRecorder === 'undefined') {

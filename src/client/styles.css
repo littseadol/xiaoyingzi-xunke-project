@@ -13,6 +13,12 @@
 body {
   margin: 0;
 }
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
 button,
 input,
 select {
@@ -124,7 +130,8 @@ small {
 }
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  width: 100%;
+  min-height: 100dvh;
 }
 .sidebar {
   width: 218px;
@@ -136,6 +143,7 @@ small {
   flex-direction: column;
   position: fixed;
   inset: 0 auto 0 0;
+  overflow-y: auto;
 }
 .sidebar .brand {
   padding: 0 8px;
@@ -265,7 +273,7 @@ small {
   color: #d65f53;
 }
 .page-content {
-  max-width: 1510px;
+  width: 100%;
   margin: auto;
   padding: 35px 38px;
 }
@@ -323,7 +331,8 @@ small {
   font-weight: 550;
 }
 .video-stage {
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
+  max-height: max(200px, calc(100dvh - 380px));
   background: #142135;
   position: relative;
   overflow: hidden;
@@ -1346,6 +1355,7 @@ input[type='checkbox'] {
   }
   .video-stage {
     aspect-ratio: 16/9;
+    max-height: none;
   }
   .live-aside {
     display: grid;
@@ -1450,7 +1460,9 @@ input[type='checkbox'] {
     flex-direction: column;
     gap: 3px;
     margin: 0;
-    width: 95px;
+    flex: 1;
+    min-width: 0;
+    width: auto;
     padding: 6px;
     color: #8a98ae;
     border-radius: 7px;
