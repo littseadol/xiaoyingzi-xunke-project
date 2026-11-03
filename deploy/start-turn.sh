@@ -1,0 +1,3 @@
+#!/bin/sh
+set -eu
+exec turnserver --listening-port=3478 --external-ip="$XY_PUBLIC_IP" --realm="$XY_TURN_HOST" --server-name="$XY_TURN_HOST" --use-auth-secret --static-auth-secret="$XY_TURN_SECRET" --fingerprint --min-port=49160 --max-port=49200 --no-cli --no-tls --no-dtls --no-multicast-peers --denied-peer-ip=10.0.0.0-10.255.255.255 --denied-peer-ip=172.16.0.0-172.31.255.255 --denied-peer-ip=192.168.0.0-192.168.255.255 --denied-peer-ip=169.254.0.0-169.254.255.255 --denied-peer-ip=127.0.0.0-127.255.255.255 --denied-peer-ip=::1 --denied-peer-ip=fc00::-fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff --denied-peer-ip=fe80::-febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff --total-quota=20 --user-quota=4 --log-file=stdout

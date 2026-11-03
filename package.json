@@ -1,0 +1,86 @@
+{
+  "name": "xiaoyingzi-classroom",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "小影子 · 云端教室摄像头与白板采集端",
+  "author": "XiaoYingZi",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "build": "npm run typecheck && vite build && tsc -p tsconfig.server.json",
+    "prebuild": "node scripts/write-cloud-origin.mjs",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.tests.json",
+    "start": "electron .",
+    "dev": "npm run build && electron .",
+    "dev:cloud": "npm run build && node scripts/dev-cloud.mjs",
+    "start:server": "node dist-server/server/cli.js",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run format:check && npm run test && npm run build",
+    "test:e2e": "playwright test",
+    "test:portable": "node tests/portable-smoke.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dist": "npm run check && electron-builder --win nsis --x64",
+    "dist:portable": "npm run check && electron-builder --win portable --x64"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "node-forge": "^1.3.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sql.js": "^1.13.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.18.0",
+    "@types/node-forge": "^1.3.13",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@types/sql.js": "^1.4.9",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^5.0.3",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7"
+  },
+  "build": {
+    "appId": "cn.xiaoyingzi.classroom",
+    "productName": "小影子教室助手",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-server/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**",
+      "node_modules/sql.js/dist/*.wasm"
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false,
+      "artifactName": "XiaoYingZi-${version}-win-x64.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": true,
+      "artifactName": "XiaoYingZi-Setup-${version}.exe",
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "小影子教室采集端"
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

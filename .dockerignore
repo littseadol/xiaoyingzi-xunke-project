@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-server
+release
+data
+test-results
+.git
+.env
+.env.*
+deploy/downloads
+*.log

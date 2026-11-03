@@ -1,0 +1,38 @@
+name: Delivery checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npx playwright install chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-evidence
+          path: test-results
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -f deploy/compose.yaml --env-file deploy/.env.example config --quiet
+      - run: docker build -t xiaoyingzi:ci .
+      - run: docker run -d --name xiaoyingzi-ci -e XY_PUBLIC_ORIGIN=https://class.example.com -p 127.0.0.1:18080:8080 xiaoyingzi:ci
+      - run: curl --fail --retry 10 --retry-connrefused --retry-delay 1 -H 'Host:class.example.com' http://127.0.0.1:18080/api/health
+      - run: docker compose -f deploy/compose.yaml --env-file deploy/.env.example run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - run: docker logs xiaoyingzi-ci
+        if: failure()
